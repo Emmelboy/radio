@@ -22,8 +22,9 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   background:radial-gradient(ellipse at 50% 30%,#1e1008 0%,#080402 100%);
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  font-family:'Special Elite',cursive;overflow:hidden;
+  min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+  font-family:'Special Elite',cursive;overflow-x:hidden;
+  padding-top:0;margin:0;
 }
 .scene{position:relative;filter:drop-shadow(0 40px 80px rgba(0,0,0,0.95));}
 .radio{
@@ -667,47 +668,30 @@ window.addEventListener('appinstalled', ()=>{
 
 // ── RESPONSIVE SCALE ─────────────────────────────────────────────────────
 const RADIO_W = 700;
-const RADIO_H = 420; // approximate natural height
 
 function scaleRadio(){
   const radio = document.getElementById('radio');
-  const scene = radio ? radio.parentElement : null;
-  if(!radio || !scene) return;
-
+  if(!radio) return;
   const vw = window.innerWidth;
-  const vh = window.innerHeight;
-
-  // Scale to fit width, but never upscale
-  const scale = Math.min(vw / RADIO_W, vh / RADIO_H, 1);
-
-  // Center in viewport
-  const scaledW = RADIO_W * scale;
-  const scaledH = (radio.offsetHeight || RADIO_H) * scale;
-
-  radio.style.position = 'absolute';
-  radio.style.transformOrigin = 'top left';
-  radio.style.transform = 'scale(' + scale + ')';
-  radio.style.left = ((vw - scaledW) / 2) + 'px';
-  radio.style.top = Math.max(0, (vh - scaledH) / 2) + 'px';
-
-  scene.style.position = 'fixed';
-  scene.style.inset = '0';
-  scene.style.width = '100vw';
-  scene.style.height = '100vh';
-  scene.style.overflow = 'hidden';
-
-  document.body.style.overflow = 'hidden';
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
+  const zoom = vw / RADIO_W;
+  if(zoom >= 1){
+    radio.style.zoom = '';
+    radio.style.marginLeft = '';
+    document.body.style.overflow = '';
+    return;
+  }
+  radio.style.zoom = zoom;
+  radio.style.marginLeft = '0';
+  document.body.style.overflowX = 'hidden';
+  document.body.style.overflowY = 'auto';
+  // Remove top black gap
+  document.body.style.alignItems = 'flex-start';
+  document.body.style.minHeight = 'unset';
 }
 
 window.addEventListener('resize', scaleRadio);
-window.addEventListener('orientationchange', ()=>{ setTimeout(scaleRadio, 250); });
-if(document.readyState === 'complete'){
-  requestAnimationFrame(()=>requestAnimationFrame(scaleRadio));
-} else {
-  window.addEventListener('load', ()=>requestAnimationFrame(()=>requestAnimationFrame(scaleRadio)));
-}
+window.addEventListener('orientationchange', ()=>{ setTimeout(scaleRadio, 300); });
+scaleRadio();
 </script>
 </body>
 </html>
