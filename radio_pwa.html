@@ -665,29 +665,42 @@ function scaleRadio(){
   const radio = document.getElementById('radio');
   const scene = radio ? radio.parentElement : null;
   if(!radio || !scene) return;
+
   const RADIO_W = 700;
   const vw = window.innerWidth;
+
   if(vw >= 740){
-    radio.style.transform = '';
-    radio.style.transformOrigin = '';
-    scene.style.height = '';
-    document.body.style.alignItems = '';
+    radio.style.cssText = '';
+    scene.style.cssText = '';
+    document.body.style.alignItems = 'center';
+    document.body.style.overflowY = '';
     return;
   }
-  const scale = (vw - 16) / RADIO_W;
-  radio.style.transformOrigin = 'top left';
+
+  const scale = (vw - 8) / RADIO_W;
+  const radioH = radio.offsetHeight || 620;
+  const scaledH = radioH * scale;
+
+  // Scale from top-center so it stays horizontally centered
+  radio.style.transformOrigin = 'top center';
   radio.style.transform = 'scale(' + scale + ')';
-  // After scale, the element still occupies original space — fix that
-  const radioH = radio.offsetHeight || 600;
-  scene.style.height = (radioH * scale + 20) + 'px';
+  radio.style.position = 'relative';
+  radio.style.left = '50%';
+  radio.style.marginLeft = '-350px'; // half of 700px original width
+
+  // Collapse the extra space the un-scaled element would occupy
+  scene.style.height = (scaledH + 16) + 'px';
   scene.style.width = '100vw';
   scene.style.overflow = 'hidden';
+  scene.style.display = 'block';
+
   document.body.style.alignItems = 'flex-start';
   document.body.style.overflowY = 'auto';
+  document.body.style.overflowX = 'hidden';
 }
+
 window.addEventListener('resize', scaleRadio);
 window.addEventListener('orientationchange', ()=>{ setTimeout(scaleRadio, 200); });
-// Wait for fonts+layout before first scale
 if(document.readyState === 'complete'){
   requestAnimationFrame(()=>requestAnimationFrame(scaleRadio));
 } else {
