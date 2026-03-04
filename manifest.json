@@ -4,7 +4,7 @@
   "description": "Vintage FM radio receiver",
   "start_url": "./radio_pwa.html",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#2e1808",
   "theme_color": "#2e1808",
   "icons": [
