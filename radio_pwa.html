@@ -663,31 +663,36 @@ window.addEventListener('appinstalled', ()=>{
 // ── RESPONSIVE SCALE ─────────────────────────────────────────────────────
 function scaleRadio(){
   const radio = document.getElementById('radio');
-  if(!radio) return;
+  const scene = radio ? radio.parentElement : null;
+  if(!radio || !scene) return;
   const RADIO_W = 700;
   const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  if(vw >= 740){ 
-    radio.style.transform='';
-    radio.style.transformOrigin='';
-    radio.parentElement.style.paddingTop='';
-    radio.parentElement.style.paddingBottom='';
+  if(vw >= 740){
+    radio.style.transform = '';
+    radio.style.transformOrigin = '';
+    scene.style.height = '';
+    document.body.style.alignItems = '';
     return;
   }
-  const scale = Math.min((vw - 10) / RADIO_W, 1);
-  const scaledH = radio.scrollHeight * scale;
-  radio.style.transform = 'scale('+scale+')';
-  radio.style.transformOrigin = 'top center';
-  // Compensate for the space transform removes
-  const diff = radio.scrollHeight - scaledH;
-  radio.parentElement.style.paddingTop = '5px';
-  radio.parentElement.style.paddingBottom = Math.max(0, -diff + 10) + 'px';
-  // Fix scene height so body scroll works
-  radio.parentElement.style.height = (scaledH + 20) + 'px';
+  const scale = (vw - 16) / RADIO_W;
+  radio.style.transformOrigin = 'top left';
+  radio.style.transform = 'scale(' + scale + ')';
+  // After scale, the element still occupies original space — fix that
+  const radioH = radio.offsetHeight || 600;
+  scene.style.height = (radioH * scale + 20) + 'px';
+  scene.style.width = '100vw';
+  scene.style.overflow = 'hidden';
+  document.body.style.alignItems = 'flex-start';
+  document.body.style.overflowY = 'auto';
 }
 window.addEventListener('resize', scaleRadio);
-window.addEventListener('orientationchange', ()=>{ setTimeout(scaleRadio, 150); });
-scaleRadio();
+window.addEventListener('orientationchange', ()=>{ setTimeout(scaleRadio, 200); });
+// Wait for fonts+layout before first scale
+if(document.readyState === 'complete'){
+  requestAnimationFrame(()=>requestAnimationFrame(scaleRadio));
+} else {
+  window.addEventListener('load', ()=>requestAnimationFrame(()=>requestAnimationFrame(scaleRadio)));
+}
 </script>
 </body>
 </html>
