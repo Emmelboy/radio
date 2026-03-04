@@ -1,0 +1,20 @@
+{
+  "name": "FM Radio — Meridian",
+  "short_name": "FM Radio",
+  "description": "Vintage FM radio receiver",
+  "start_url": "./radio_pwa.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2e1808",
+  "theme_color": "#2e1808",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%232e1808' rx='24'/><text x='96' y='130' text-anchor='middle' font-size='100'>📻</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "music"],
+  "lang": "ru"
+}
