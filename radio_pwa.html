@@ -206,6 +206,7 @@ input[type=range]::-moz-range-thumb{
 *{-webkit-tap-highlight-color:transparent;}
 body{overscroll-behavior:none;-webkit-overflow-scrolling:touch;}
 input[type=range]{-webkit-appearance:none;touch-action:pan-x;}
+html,body{width:100%;height:100%;}
 #install-banner{
   display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
   background:rgba(46,24,8,0.95);border:1px solid var(--amber);border-radius:12px;
@@ -221,12 +222,19 @@ input[type=range]{-webkit-appearance:none;touch-action:pan-x;}
 #install-banner .dismiss{
   background:transparent;color:var(--amber);margin-top:4px;font-size:11px;opacity:0.7;
 }
-@media(max-width:600px){
-  .scene{padding:10px 5px;}
-  .radio{transform:scale(0.82);transform-origin:top center;}
-}
-@media(max-width:400px){
-  .radio{transform:scale(0.68);transform-origin:top center;}
+/* Mobile scaling via JS zoom trick - handled in script below */
+@media(max-width:740px){
+  body{
+    align-items:flex-start;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .scene{
+    padding:0;
+    width:100vw;
+    display:flex;
+    justify-content:center;
+  }
 }
 </style>
 </head>
@@ -651,6 +659,35 @@ window.addEventListener('appinstalled', ()=>{
   banner.style.display='none';
   deferredPrompt = null;
 });
+
+// ── RESPONSIVE SCALE ─────────────────────────────────────────────────────
+function scaleRadio(){
+  const radio = document.getElementById('radio');
+  if(!radio) return;
+  const RADIO_W = 700;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  if(vw >= 740){ 
+    radio.style.transform='';
+    radio.style.transformOrigin='';
+    radio.parentElement.style.paddingTop='';
+    radio.parentElement.style.paddingBottom='';
+    return;
+  }
+  const scale = Math.min((vw - 10) / RADIO_W, 1);
+  const scaledH = radio.scrollHeight * scale;
+  radio.style.transform = 'scale('+scale+')';
+  radio.style.transformOrigin = 'top center';
+  // Compensate for the space transform removes
+  const diff = radio.scrollHeight - scaledH;
+  radio.parentElement.style.paddingTop = '5px';
+  radio.parentElement.style.paddingBottom = Math.max(0, -diff + 10) + 'px';
+  // Fix scene height so body scroll works
+  radio.parentElement.style.height = (scaledH + 20) + 'px';
+}
+window.addEventListener('resize', scaleRadio);
+window.addEventListener('orientationchange', ()=>{ setTimeout(scaleRadio, 150); });
+scaleRadio();
 </script>
 </body>
 </html>
